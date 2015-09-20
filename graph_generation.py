@@ -81,12 +81,35 @@ def create_node_pool(node_count):
 
 
 
-
 def create_random_spanning_tree(nodes):
 	"""
 	Given a list of nodes, returns a Graph object which is a uniform random spanning tree on the nodes.
-	"""
 
+	Runs a randomized Kruskal's algorithm.
+	"""
+	components = networkx.utils.UnionFind()
+	tree = networkx.Graph()
+	possible_edges = [(u,v) for u in nodes for v in nodes]
+
+	# Shuffle edges to make function stochastic
+	random.shuffle(possible_edges)
+
+	# Insert all nodes into disjoint sets structure
+	[components[node] for node in nodes]
+
+	# Build spanning tree by adding edges that don't induce a cycle
+	for u,v in possible_edges:
+		if components[u] != components[v]:
+			components.union(u,v)
+			tree.add_edge(u,v)
+
+
+def directed_tree_from_undirected_tree(undirected_tree, root):
+	"""
+	Given an undirected tree and a root node in that tree, returns a directed tree where the edges
+	are oriented away from the root.
+	"""
+	
 
 
 
