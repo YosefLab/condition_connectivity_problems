@@ -5,19 +5,20 @@ import networkx
 import random
 
 
-def create_sample_DCP_instance(node_count=100, tree_count=10):
+def create_sample_DCP_instance(node_count=100, tree_count=10, tree_span=float('infinity')):
 	"""
 	Generates a sample DCP problem instance:
 		- A directed graph
 		- A dictionary specifying node existence times
 		- A list of connectivity demands
 
-	The graph is created by sampling trees from a pool of nodes, then taking their union.
+	The graph is created by sampling trees (each on at most tree_span nodes) from a pool of nodes,
+	then taking their union.
 	"""
-	node_pool = create_node_pool(node_count)
+	nodes = create_node_pool(node_count)
 
 	# Map from each node to a set of time indices at which it is active
-	node_existence_times = {node : set() for node in node_pool}
+	node_existence_times = {node : set() for node in nodes}
 
 	# List of connectivity demands in the form (source, target, time)
 	connectivity_demands = []
@@ -26,10 +27,11 @@ def create_sample_DCP_instance(node_count=100, tree_count=10):
 	trees = []
 	for time in range(tree_count):
 
-		# TODO: CHOOSE A RANDOM SUBSET OF NODES TO BUILD TREE FROM
+		# Choose a random subset of the nodes from which to build the tree
+		tree_nodes = random.sample(nodes, min(len(nodes), tree_span))
 
 		# Sample a tree
-		tree, source, terminals = create_sample_tree(node_pool)
+		tree, source, terminals = create_sample_tree(tree_nodes)
 
 		# Record tree
 		trees += [tree]
@@ -49,16 +51,17 @@ def create_sample_DCP_instance(node_count=100, tree_count=10):
 
 
 
-# TODO: ALLOW UPPER LIMIT ON NUMBER OF TERMINALS IN TREE
-def create_sample_tree(node_pool):
+def create_sample_tree(nodes, max_terminal_count=float('infinity')):
 	"""
 	Given a pool of nodes, samples a directed tree. Returns:
 		- The directed tree
 		- The source node
 		- A list of terminal nodes
+
+	Ensures that the number of terminals is at most max_terminal_count, though it may be fewer.
 	"""
-	# Copy node pool for safety
-	nodes = list(node_pool)
+	# Copy nodes for safety
+	nodes = list(nodes)
 
 	# Build random (undirected) spanning tree
 	undirected_tree = create_random_spanning_tree(nodes)
@@ -69,8 +72,9 @@ def create_sample_tree(node_pool):
 	# Build directed tree with source as root
 	directed_tree = directed_tree_from_undirected_tree(undirected_tree, source)
 
-	# Declare all leaves to be terminals
-	terminals = list(filter(lambda v: directed_tree.out_degree(v) == 0, directed_tree.nodes_iter()))
+	# Declare some leaves to be terminals
+	leaves = list(filter(lambda v: directed_tree.out_degree(v) == 0, directed_tree.nodes_iter()))
+	terminals = leaves[0:min(len(leaves), max_terminal_count)]
 
 	return directed_tree, source, terminals
 
