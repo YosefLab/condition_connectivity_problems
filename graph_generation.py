@@ -31,6 +31,9 @@ def create_sample_DCP_instance(node_count=100, tree_count=10):
 		# Sample a tree
 		tree, source, terminals = create_sample_tree(node_pool)
 
+		# Record tree
+		trees += [tree]
+
 		# Record existence of tree nodes at the current time
 		for node in tree.nodes_iter():
 			node_existence_times[node].add(time)
@@ -121,9 +124,11 @@ def directed_tree_from_undirected_tree(undirected_tree, root):
 		"""
 		for v in undirected_tree.neighbors(u):
 			# If neighbor v is not u's parent, then it should be marked as a child
-			if not undirected_tree.has_edge(v,u):
+			if not directed_tree.has_edge(v,u):
 				directed_tree.add_edge(u,v)
 				explore_node(v)
+
+	explore_node(root)
 
 	return directed_tree
 
