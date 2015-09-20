@@ -103,13 +103,30 @@ def create_random_spanning_tree(nodes):
 			components.union(u,v)
 			tree.add_edge(u,v)
 
+	return tree
+
+
 
 def directed_tree_from_undirected_tree(undirected_tree, root):
 	"""
 	Given an undirected tree and a root node in that tree, returns a directed tree where the edges
 	are oriented away from the root.
 	"""
-	
+	directed_tree = networkx.DiGraph()
+
+	def explore_node(u):
+		"""
+		Performs DFS from the given node of the undirected tree. Along the way, adds directed edges
+		to its children in the directed tree.
+		"""
+		for v in undirected_tree.neighbors(u):
+			# If neighbor v is not u's parent, then it should be marked as a child
+			if not undirected_tree.has_edge(v,u):
+				directed_tree.add_edge(u,v)
+				explore_node(v)
+
+	return directed_tree
+
 
 
 
