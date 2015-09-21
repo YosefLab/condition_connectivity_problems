@@ -6,7 +6,9 @@ import matplotlib.pyplot as pyplot
 
 
 def test_create_sample_DCP_instance():
-	graph, node_existence_times, connectivity_demands = create_sample_DCP_instance(node_count=100, tree_count=4, tree_span=30)
+	graph, node_existence_times, connectivity_demands = create_sample_DCP_instance(node_count=100, tree_count=5, tree_span=30)
+
+	print("Graph has total weight " + str(graph.size()))
 
 	# Assign non-terminals red, terminals green
 	color_for_node = {node : 'r' for node in graph.nodes()}
