@@ -8,17 +8,17 @@ import random
 def create_sample_DCP_instance(node_count=100, tree_count=10, tree_span=float('infinity')):
 	"""
 	Generates a sample DCP problem instance:
-		- A directed graph
-		- A dictionary specifying node existence times
-		- A list of connectivity demands
+		- A directed graph with attribute 'weight' on all edges
+		- A dictionary from (node, time) to existence {True, False}
+		- A list of connectivity demands (source, target, time)
 
 	The graph is created by sampling trees (each on at most tree_span nodes) from a pool of nodes,
 	then taking their union.
 	"""
 	nodes = create_node_pool(node_count)
 
-	# Map from each node to a set of time indices at which it is active
-	node_existence_times = {node : set() for node in nodes}
+	# Map each (node, time) to its existence, initially 0
+	existence_for_node_time = {(node,time): 0 for node in nodes for time in range(tree_count)}
 
 	# List of connectivity demands in the form (source, target, time)
 	connectivity_demands = []
@@ -38,16 +38,17 @@ def create_sample_DCP_instance(node_count=100, tree_count=10, tree_span=float('i
 
 		# Record existence of tree nodes at the current time
 		for node in tree.nodes_iter():
-			node_existence_times[node].add(time)
+			existence_for_node_time[node,time] = 1
 
 		# Record connectivity demands for this tree/time
 		for target in terminals:
 			connectivity_demands += [(source, target, time)]
 
 
-	union_of_trees = networkx.compose_all(trees)
+	# Union of trees
+	graph = networkx.compose_all(trees)
 
-	return union_of_trees, node_existence_times, connectivity_demands
+	return graph, existence_for_node_time, connectivity_demands
 
 
 
