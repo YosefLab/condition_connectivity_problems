@@ -48,6 +48,11 @@ def create_sample_DCP_instance(node_count=100, tree_count=10, tree_span=float('i
 	# Union of trees
 	graph = networkx.compose_all(trees)
 
+	# Weights on edges
+	# TODO: make weights non-unit
+	for u,v in graph.edges_iter():
+		graph[u][v]['weight'] = 1
+
 	return graph, existence_for_node_time, connectivity_demands
 
 
