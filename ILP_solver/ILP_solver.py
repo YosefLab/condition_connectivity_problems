@@ -1,4 +1,5 @@
 from gurobipy import *
+import networkx
 
 
 def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
@@ -27,7 +28,59 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 			- A single source node
 			- A single target node
 		"""
-		# To be implemented
+		# Initialize new graph to original graph
+		new_graph = graph.copy()
+
+		# Create a supply of new nodes for reduction
+		max_node = max(graph.nodes_iter()) # Ensure we do not overwrite existing node
+		new_node_stack = range(max_node + 2 * (len(connectivity_demands) + 1), max_node, -1)
+
+		# Map old times to new (all distinct) times
+		new_times = range(len(connectivity_demands)) # [1,...,k]
+		original_time_for_new_time = {}
+		for new_time, (_, _, original_time) in enumerate(connectivity_demands):
+			original_time_for_new_time[new_time] = original_time # Map i --> i-th demand's original time
+
+		# Add universal source and target
+		source = new_node_stack.pop()
+		target = new_node_stack.pop()
+		new_graph.add_nodes_from([source, target])
+
+		# Add source and target buffer nodes
+		buffer_nodes_and_times = []
+		for new_time, (original_source, original_target, original_time) in enumerate(connectivity_demands):
+			# universal source --> buffer --> original source
+			source_buffer = new_node_stack.pop()
+			new_graph.add_edge(source, source_buffer, weight=0)
+			new_graph.add_edge(source_buffer, original_source, weight=0)
+
+			# original target --> buffer --> universal target
+			target_buffer = new_node_stack.pop()
+			new_graph.add_edge(original_target, target_buffer, weight=0)
+			new_graph.add_edge(target_buffer, target, weight=0)
+
+			# Record existence time for buffer nodes
+			buffer_nodes_and_times += [(source_buffer, new_time), (target_buffer, new_time)]
+
+		# Set node existence dictionary for new graph, under new time points
+		new_existence_for_node_time = {(v,t): 0 for v in new_graph.nodes_iter() for t in new_times}
+		# Map times for nodes in original graph
+		for new_time in new_times:
+			original_time = original_time_for_new_time[new_time]
+			for node in graph.nodes_iter():
+				new_existence_for_node_time[node, new_time] = existence_for_node_time[node, original_time]
+		# Universal source and target exist at all times
+		for new_time in new_times:
+			new_existence_for_node_time[source, new_time] = 1
+			new_existence_for_node_time[target, new_time] = 1
+		# Map times for buffer nodes
+		for buffer_node, new_time in buffer_nodes_and_times:
+			new_existence_for_node_time[buffer_node, new_time] = 1
+
+		# Create new connectivity demands
+		new_connectivity_demands = [(source, target, new_time) for new_time in new_times]
+
+		return new_graph, new_existence_for_node_time, new_connectivity_demands, source, target
 
 	def recover_DCP_solution_from_sDCP_solution(subgraph, source, target):
 		"""
@@ -38,12 +91,22 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 
 		returns the subgraph that is the solution to the original DCP instance.
 		"""
-		# To be implemented
+		# Clean up auxiliary sources
+		for original_source in subgraph.get_successors_iter(source):
+			subgraph.remove_node(original_source)
+		subgraph.remove_node(source)
+
+		# Clean up auxiliary targets
+		for original_target in subgraph.get_predecessors_iter(target):
+			subgraph.remove_node(original_target)
+		subgraph.remove_node(target)
+
+		return subgraph
 
 	# Reduce to sDCP
-	return recover_DCP_solution_from_sDCP_solution(
-		transform_DCP_to_sDCP(graph, existence_for_node_time, connectivity_demands)
-	)
+	simple_graph, simple_existence_for_node_time, simple_connectivity_demands, source, target = transform_DCP_to_sDCP(graph, existence_for_node_time, connectivity_demands)
+	simple_subgraph = solve_sDCP_instance(simple_graph, simple_existence_for_node_time, simple_connectivity_demands)
+	return recover_DCP_solution_from_sDCP_solution(simple_subgraph, source, target)
 
 
 
@@ -63,7 +126,7 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 	times = list(set([time for source, target, time in connectivity_demands]))
 
 	# Sources get +1 sourceflow, targets get -1, other nodes 0
-	sourceflow = {(v,t): 0 for v in graph.nodes() for t in times}
+	sourceflow = {(v,t): 0 for v in graph.nodes_iter() for t in times}
 	for source, target, time in connectivity_demands:
 		sourceflow[source,time] = 1
 		sourceflow[target,time] = -1
