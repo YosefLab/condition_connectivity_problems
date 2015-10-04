@@ -1,21 +1,11 @@
 """
-This file tests graph generation functionality.
+This file implements algorithms for generating sample graphs.
 """
-from graph_generation import *
+import networkx
 import matplotlib.pyplot as pyplot
 
 
-def test_create_sample_DCP_instance():
-	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(node_count=1000, tree_count=10, tree_span=100)
-
-	print("Graph has total weight " + str(graph.size()))
-
-	visualize_DCP_instance(graph, existence_for_node_time, connectivity_demands)
-
-
-
-
-def visualize_DCP_instance(graph, existence_for_node_time, connectivity_demands):
+def draw_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 	# Assign non-terminals red, terminals green
 	color_for_node = {node : 'r' for node in graph.nodes()}
 	for source, target, time in connectivity_demands:
@@ -35,11 +25,3 @@ def visualize_DCP_instance(graph, existence_for_node_time, connectivity_demands)
 
 	pyplot.savefig("test_graph.png")
 	pyplot.show()
-
-
-
-
-
-
-if __name__ == "__main__":
-	test_create_sample_DCP_instance()
