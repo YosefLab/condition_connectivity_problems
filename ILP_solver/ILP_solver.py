@@ -67,7 +67,7 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 	model.setObjective(objective_expression, GRB.MINIMIZE)
 
 
-	print( '\n\n======================================================' )
+	print( '======================================================' )
 	# SOLVE
 	model.optimize()
 
