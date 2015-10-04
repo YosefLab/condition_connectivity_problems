@@ -90,7 +90,7 @@ def create_node_pool(node_count):
 	"""
 	Returns a list of nodes (integers 0,...,99).
 	"""
-	return [i for i in range(node_count)]
+	return range(node_count)
 
 
 
