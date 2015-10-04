@@ -1,7 +1,8 @@
 """
 This file tests ILP solver functionality.
 """
-from graph_generation.graph_generation import *
+from graph_tools.generation import *
+from graph_tools.visualization import *
 from ILP_solver.ILP_solver import *
 import matplotlib.pyplot as pyplot
 
