@@ -120,7 +120,6 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 
 	returns a list of edges of minimal weight that satisfies the demands.
 	"""
-
 	# MODEL SETUP
 	# Infer a list of times
 	times = list(set([time for source, target, time in connectivity_demands]))
@@ -181,15 +180,23 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 	model.optimize()
 
 
-	# PRINT SOLUTION
+	# RECOVER SOLUTION
+	subgraph = networkx.DiGraph()
 	if model.status == GRB.status.OPTIMAL:
-		print('Edges in minimal subgraph:')
 		value_for_edge = model.getAttr('x', edge_variables)
 		for u,v in graph.edges_iter():
 			if value_for_edge[u,v] > 0:
-				print( '%s -> %s' % (u, v) )
+				subgraph.add_edge(u, v, weight=graph[u][v]['weight'])
+
+
+	# PRINT SOLUTION
+	print('Edges in minimal subgraph:')
+	for u,v in subgraph:
+		print( '%s -> %s' % (u, v) )
 
 	print( '======================================================\n\n' )
+
+	return subgraph
 
 
 
