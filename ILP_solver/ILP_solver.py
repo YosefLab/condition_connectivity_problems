@@ -63,7 +63,7 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 
 	# OBJECTIVE
 	# Minimize total subgraph weight
-	objective_expression = quicksum(edge_variables[u,v] * G[u][v]['weight'] for u,v in G.edges_iter())
+	objective_expression = quicksum(edge_variables[u,v] * graph[u][v]['weight'] for u,v in graph.edges_iter())
 	model.setObjective(objective_expression, GRB.MINIMIZE)
 
 
