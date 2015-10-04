@@ -91,22 +91,19 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 
 		returns the subgraph that is the solution to the original DCP instance.
 		"""
-		# Clean up auxiliary sources
-		for original_source in subgraph.get_successors_iter(source):
-			subgraph.remove_node(original_source)
-		subgraph.remove_node(source)
-
-		# Clean up auxiliary targets
-		for original_target in subgraph.get_predecessors_iter(target):
-			subgraph.remove_node(original_target)
-		subgraph.remove_node(target)
-
+		# Clean up universal source and target, and buffers
+		subgraph.remove_nodes_from([source_buffer for source_buffer in subgraph.successors(source)])
+		subgraph.remove_nodes_from([target_buffer for target_buffer in subgraph.predecessors(target)])
+		subgraph.remove_nodes_from([source, target])
 		return subgraph
 
 	# Reduce to sDCP
 	simple_graph, simple_existence_for_node_time, simple_connectivity_demands, source, target = transform_DCP_to_sDCP(graph, existence_for_node_time, connectivity_demands)
 	simple_subgraph = solve_sDCP_instance(simple_graph, simple_existence_for_node_time, simple_connectivity_demands)
-	return recover_DCP_solution_from_sDCP_solution(simple_subgraph, source, target)
+	if simple_subgraph is not None:
+		return recover_DCP_solution_from_sDCP_solution(simple_subgraph, source, target)
+	else:
+		return None # No solution
 
 
 
@@ -175,12 +172,12 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 	model.setObjective(objective_expression, GRB.MINIMIZE)
 
 
+	# SOLVE AND RECOVER SOLUTION
 	print( '======================================================' )
-	# SOLVE
 	model.optimize()
 
 
-	# RECOVER SOLUTION
+	# Recover minimal subgraph
 	subgraph = networkx.DiGraph()
 	if model.status == GRB.status.OPTIMAL:
 		value_for_edge = model.getAttr('x', edge_variables)
@@ -188,15 +185,14 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 			if value_for_edge[u,v] > 0:
 				subgraph.add_edge(u, v, weight=graph[u][v]['weight'])
 
-
-	# PRINT SOLUTION
-	print('Edges in minimal subgraph:')
-	for u,v in subgraph:
-		print( '%s -> %s' % (u, v) )
+		# Print solution
+		print('Edges in minimal subgraph:')
+		for u,v in subgraph.edges_iter():
+			print( '%s -> %s' % (u, v) )
 
 	print( '======================================================\n\n' )
 
-	return subgraph
-
+	# Return solution iff found
+	return subgraph if model.status == GRB.status.OPTIMAL else None
 
 
