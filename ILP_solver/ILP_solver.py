@@ -10,7 +10,7 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 		- A dictionary from (node, time) to existence {True, False}
 		- A list of connectivity demands (source, target, time)
 
-	returns the minimum subgraph that respects the connectivity demands.
+	returns a minimum weight subgraph that satisfies the demands.
 
 	Works by reducing to simple DCP (sDCP).
 	"""
@@ -121,7 +121,7 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 		- A list of connectivity demands (source, target, time)
 			ASSUMPTION: each demand is at a different time
 
-	returns a list of edges of minimal weight that satisfies the demands.
+	returns a minimum weight subgraph that satisfies the demands.
 	"""
 	# MODEL SETUP
 	# Infer a list of times
