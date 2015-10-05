@@ -18,11 +18,11 @@ def draw_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 		node_sequence += [node]
 		color_sequence += [color]
 
-	networkx.draw(graph, nodelist=node_sequence, node_color=color_sequence)
+	# Label each node with its name
+	node_labels = {node: node for node in graph.nodes_iter()}
 
-	# Finer control over spring layout
-	# networkx.draw(G, pos=networkx.spring_layout(G, iterations=20), nodelist=node_sequence, node_color=color_sequence)
-
+	# Draw graph and save image
+	networkx.draw(graph, nodelist=node_sequence, node_color=color_sequence, labels=node_labels)
 	pyplot.savefig("test_graph.png")
 	pyplot.show()
 
@@ -39,3 +39,4 @@ def print_edges_in_graph(graph, edges_per_line=5):
 			edges_string += '\n'
 
 	print edges_string
+
