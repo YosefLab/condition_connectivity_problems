@@ -7,23 +7,24 @@ from ILP_solver.ILP_solver import *
 import matplotlib.pyplot as pyplot
 
 
-def test_solve_random_instance(draw_instance=False):
+def test_solve_random_instance(detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a randomly generated instance.
 	"""
 	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(node_count=50, tree_count=5, tree_span=30)
 
-	if draw_instance:
+	if detailed_output:
 		draw_DCP_instance(graph, existence_for_node_time, connectivity_demands)
 
 	print('Testing random DCP instance.')
 	print('Total weight: ' + str(graph.size(weight='weight')))
-	print('Connectivity demands: ' + str([(demand[0], demand[1]) for demand in connectivity_demands]))
+	if detailed_output:
+		print('Connectivity demands: ' + str([(demand[0], demand[1]) for demand in connectivity_demands]))
 
-	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands)
+	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output)
 
 
-def test_solve_path_instance(feasible=True):
+def test_solve_path_instance(feasible=True, detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a simple path at two time points.
 	"""
@@ -48,10 +49,10 @@ def test_solve_path_instance(feasible=True):
 
 	connectivity_demands = [(1,4,1), (1,4,2)]
 
-	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands)
+	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output)
 
 
-def test_solve_tree_instance(multiple_times=True):
+def test_solve_tree_instance(multiple_times=True, detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a directed tree at two time points.
 	"""
@@ -77,10 +78,10 @@ def test_solve_tree_instance(multiple_times=True):
 
 	connectivity_demands = [(1,3,1), (1,4,2 if multiple_times else 1)]
 
-	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands)
+	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output)
 
 
-def test_solve_anti_greedy_instance():
+def test_solve_anti_greedy_instance(detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a small instance that penalizes greedy behavior.
 	"""
@@ -106,7 +107,7 @@ def test_solve_anti_greedy_instance():
 
 	connectivity_demands = [(1,2,1), (3,4,2)]
 
-	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands)
+	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output)
 
 
 
@@ -126,7 +127,7 @@ if __name__ == "__main__":
 
 	for test, kwargs in tests:
 		print( '-----------------------------------------------------------------------' )
-		test(**kwargs)
+		test(detailed_output=False, **kwargs)
 		print( '-----------------------------------------------------------------------\n\n' )
 
 

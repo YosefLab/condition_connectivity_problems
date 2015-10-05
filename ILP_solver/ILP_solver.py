@@ -3,7 +3,7 @@ import networkx
 from graph_tools.visualization import *
 
 
-def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
+def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output=False):
 	"""
 	Given a DCP problem instance:
 		- A directed graph with attribute 'weight' on all edges
@@ -15,7 +15,7 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 	Works by reducing to simple DCP (sDCP).
 	"""
 
-	def transform_DCP_to_sDCP(graph, existence_for_node_time, connectivity_demands):
+	def transform_DCP_to_sDCP(graph, existence_for_node_time, connectivity_demands, detailed_output=False):
 		"""
 		Given a DCP instance:
 			- A directed graph with attribute 'weight' on all edges
@@ -82,13 +82,15 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 		new_connectivity_demands = [(source, target, new_time) for new_time in new_times]
 
 		print( '-----------------------------------------------------------------------' )
-		print('Reduced DCP instance to sDCP instance. Buffer nodes added:')
-		for buffer_node, new_time in buffer_nodes_and_times:
-			print( str(buffer_node) + ' at time ' + str(new_time) )
+		print('Reduced DCP instance to sDCP instance.')
+		if detailed_output:
+			print('Buffer nodes added:')
+			for buffer_node, new_time in buffer_nodes_and_times:
+				print( str(buffer_node) + ' at time ' + str(new_time) )
 
 		return new_graph, new_existence_for_node_time, new_connectivity_demands, source, target
 
-	def recover_DCP_solution_from_sDCP_solution(subgraph, source, target):
+	def recover_DCP_solution_from_sDCP_solution(subgraph, source, target, detailed_output=False):
 		"""
 		Given a solution to an instance of sDCP:
 			- A subgraph of the original graph
@@ -103,22 +105,26 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 		subgraph.remove_nodes_from([source, target])
 
 		print( '-----------------------------------------------------------------------' )
-		print('Recovered DCP solution from sDCP solution. Edges in minimal subgraph:')
-		print_edges_in_graph(subgraph)
+		print('Recovered DCP solution from sDCP solution.')
+		if detailed_output:
+			print('Edges in minimal subgraph:')
+			print_edges_in_graph(subgraph)
 
 		return subgraph
 
 	# Reduce to sDCP
-	simple_graph, simple_existence_for_node_time, simple_connectivity_demands, source, target = transform_DCP_to_sDCP(graph, existence_for_node_time, connectivity_demands)
-	simple_subgraph = solve_sDCP_instance(simple_graph, simple_existence_for_node_time, simple_connectivity_demands)
+	simple_graph, simple_existence_for_node_time, simple_connectivity_demands, source, target = transform_DCP_to_sDCP(graph, existence_for_node_time, connectivity_demands, detailed_output)
+
+	simple_subgraph = solve_sDCP_instance(simple_graph, simple_existence_for_node_time, simple_connectivity_demands, detailed_output)
+	
 	if simple_subgraph is not None:
-		return recover_DCP_solution_from_sDCP_solution(simple_subgraph, source, target)
+		return recover_DCP_solution_from_sDCP_solution(simple_subgraph, source, target, detailed_output)
 	else:
 		return None # No solution
 
 
 
-def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
+def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output=False):
 	"""
 	Given a simple DCP (sDCP) problem instance:
 		- A directed graph with attribute 'weight' on all edges
@@ -197,8 +203,10 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 
 		# Print solution
 		print( '-----------------------------------------------------------------------' )
-		print('Solved sDCP instance. Edges in minimal subgraph:')
-		print_edges_in_graph(subgraph)
+		print('Solved sDCP instance.')
+		if detailed_output:
+			print('Edges in minimal subgraph:')
+			print_edges_in_graph(subgraph)
 
 	# Return solution iff found
 	return subgraph if model.status == GRB.status.OPTIMAL else None
