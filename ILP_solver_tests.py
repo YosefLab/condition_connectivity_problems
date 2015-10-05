@@ -7,13 +7,14 @@ from ILP_solver.ILP_solver import *
 import matplotlib.pyplot as pyplot
 
 
-def test_solve_random_instance():
+def test_solve_random_instance(draw_instance=False):
 	"""
 	Tests the DCP ILP solver on a randomly generated instance.
 	"""
 	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(node_count=100, tree_count=5, tree_span=15)
 
-	draw_DCP_instance(graph, existence_for_node_time, connectivity_demands)
+	if draw_instance:
+		draw_DCP_instance(graph, existence_for_node_time, connectivity_demands)
 
 	print('Testing random DCP instance.')
 	print('Total weight: ' + str(graph.size(weight='weight')))
