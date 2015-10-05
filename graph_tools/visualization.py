@@ -3,6 +3,7 @@ This file implements algorithms for generating sample graphs.
 """
 import networkx
 import matplotlib.pyplot as pyplot
+import time, datetime
 
 
 def draw_DCP_instance(graph, existence_for_node_time, connectivity_demands):
@@ -39,4 +40,10 @@ def print_edges_in_graph(graph, edges_per_line=5):
 			edges_string += '\n'
 
 	print edges_string
+
+
+def execution_time(start_time, end_time):
+	execution_delta = datetime.timedelta(seconds=end_time - start_time)
+	return execution_delta.days, execution_delta.seconds // 3600, (execution_delta.seconds // 60) % 60, execution_delta.seconds % 60
+
 

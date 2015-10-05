@@ -29,6 +29,8 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, det
 			- A single source node
 			- A single target node
 		"""
+		start_time = time.time()
+
 		# Initialize new graph to original graph
 		new_graph = graph.copy()
 
@@ -81,12 +83,17 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, det
 		# Create new connectivity demands
 		new_connectivity_demands = [(source, target, new_time) for new_time in new_times]
 
+		# Print information
 		print( '-----------------------------------------------------------------------' )
 		print('Reduced DCP instance to sDCP instance.')
 		if detailed_output:
 			print('Buffer nodes added:')
 			for buffer_node, new_time in buffer_nodes_and_times:
 				print( str(buffer_node) + ' at time ' + str(new_time) )
+
+		end_time = time.time()
+		days, hours, minutes, seconds = execution_time(start_time, end_time)
+		print('DCP -> sDCP instance transformation took %s days, %s hours, %s minutes, %s seconds' % (days, hours, minutes, seconds))
 
 		return new_graph, new_existence_for_node_time, new_connectivity_demands, source, target
 
@@ -99,16 +106,23 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, det
 
 		returns the subgraph that is the solution to the original DCP instance.
 		"""
+		start_time = time.time()
+
 		# Clean up universal source and target, and buffers
 		subgraph.remove_nodes_from([source_buffer for source_buffer in subgraph.successors(source)])
 		subgraph.remove_nodes_from([target_buffer for target_buffer in subgraph.predecessors(target)])
 		subgraph.remove_nodes_from([source, target])
 
+		# Print information
 		print( '-----------------------------------------------------------------------' )
 		print('Recovered DCP solution from sDCP solution.')
 		if detailed_output:
 			print('Edges in minimal subgraph:')
 			print_edges_in_graph(subgraph)
+
+		end_time = time.time()
+		days, hours, minutes, seconds = execution_time(start_time, end_time)
+		print('sDCP -> DCP solution recovery took %s days, %s hours, %s minutes, %s seconds' % (days, hours, minutes, seconds))
 
 		return subgraph
 
