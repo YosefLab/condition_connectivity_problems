@@ -19,6 +19,8 @@ def test_solve_path_instance(feasible=True):
 	"""
 	Tests the DCP ILP solver on a simple path at two time points.
 	"""
+	print('Testing path instance, should be ' + ('feasible' if feasible else 'infeasible'))
+
 	graph = networkx.DiGraph()
 
 	graph.add_path([1,2,3,4])
@@ -45,6 +47,8 @@ def test_solve_tree_instance(multiple_times=True):
 	"""
 	Tests the DCP ILP solver on a directed tree at two time points.
 	"""
+	print('Testing tree instance with ' + ('multiple times' if multiple_times else 'single time'))
+
 	graph = networkx.DiGraph()
 
 	graph.add_path([1,2,3])
@@ -68,18 +72,20 @@ def test_solve_tree_instance(multiple_times=True):
 	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands)
 
 
-
 if __name__ == "__main__":
-	print('Testing path instance, should be feasible')
-	test_solve_path_instance(feasible=True)
-	print('Testing path instance, should be infeasible')
-	test_solve_path_instance(feasible=False)
+	tests = [
+		(test_solve_path_instance, {'feasible': True}),
+		(test_solve_path_instance, {'feasible': False}),
 
-	print('Testing tree instance with multiple times')
-	test_solve_tree_instance(multiple_times=True)
-	print('Testing tree instance with single time')
-	test_solve_tree_instance(multiple_times=False)
+		(test_solve_tree_instance, {'multiple_times': True}),
+		(test_solve_tree_instance, {'multiple_times': False}),
 
-	test_solve_random_DCP_instance()
+		(test_solve_random_DCP_instance, {})
+	]
+
+	for test, kwargs in tests:
+		print( '-----------------------------------------------------------------------' )
+		test(**kwargs)
+		print( '-----------------------------------------------------------------------\n\n' )
 
 

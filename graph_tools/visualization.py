@@ -25,3 +25,17 @@ def draw_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 
 	pyplot.savefig("test_graph.png")
 	pyplot.show()
+
+
+def print_edges_in_graph(graph, edges_per_line=5):
+	edges_string = ''
+	edges_printed_in_line = 0
+
+	for u,v in graph.edges_iter():
+		edges_string += '%s -> %s        ' % (u, v)
+		edges_printed_in_line += 1
+		if edges_printed_in_line >= edges_per_line:
+			edges_printed_in_line = 0
+			edges_string += '\n'
+
+	print edges_string

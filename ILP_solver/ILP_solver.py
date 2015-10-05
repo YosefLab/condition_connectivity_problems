@@ -1,5 +1,6 @@
 from gurobipy import *
 import networkx
+from graph_tools.visualization import *
 
 
 def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
@@ -79,6 +80,11 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 
 		# Create new connectivity demands
 		new_connectivity_demands = [(source, target, new_time) for new_time in new_times]
+
+		print( '-----------------------------------------------------------------------' )
+		print('Reduced DCP instance to sDCP instance. Buffer nodes added:')
+		for buffer_node, new_time in buffer_nodes_and_times:
+			print( str(buffer_node) + ' at time ' + str(new_time) )
 
 		return new_graph, new_existence_for_node_time, new_connectivity_demands, source, target
 
@@ -173,9 +179,8 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 
 
 	# SOLVE AND RECOVER SOLUTION
-	print( '======================================================' )
+	print( '-----------------------------------------------------------------------' )
 	model.optimize()
-
 
 	# Recover minimal subgraph
 	subgraph = networkx.DiGraph()
@@ -186,11 +191,8 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 				subgraph.add_edge(u, v, weight=graph[u][v]['weight'])
 
 		# Print solution
-		print('Edges in minimal subgraph:')
-		for u,v in subgraph.edges_iter():
-			print( '%s -> %s' % (u, v) )
-
-	print( '======================================================\n\n' )
+		print('Solved sDCP instance. Edges in minimal subgraph:')
+		print_edges_in_graph(subgraph)
 
 	# Return solution iff found
 	return subgraph if model.status == GRB.status.OPTIMAL else None
