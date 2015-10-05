@@ -1,6 +1,7 @@
 from gurobipy import *
 import networkx
 from graph_tools.visualization import *
+import time as python_time
 
 
 def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output=False):
@@ -148,6 +149,8 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands, de
 
 	returns a minimum weight subgraph that satisfies the demands.
 	"""
+	start_time = python_time.time()
+
 	# MODEL SETUP
 	# Infer a list of times
 	times = list(set([time for source, target, time in connectivity_demands]))
@@ -221,6 +224,10 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands, de
 		if detailed_output:
 			print('Edges in minimal subgraph:')
 			print_edges_in_graph(subgraph)
+
+	end_time = python_time.time()
+	days, hours, minutes, seconds = execution_time(start_time, end_time)
+	print('sDCP solving took %s days, %s hours, %s minutes, %s seconds' % (days, hours, minutes, seconds))
 
 	# Return solution iff found
 	return subgraph if model.status == GRB.status.OPTIMAL else None
