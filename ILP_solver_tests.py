@@ -11,7 +11,7 @@ def test_solve_random_instance(draw_instance=False):
 	"""
 	Tests the DCP ILP solver on a randomly generated instance.
 	"""
-	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(node_count=100, tree_count=5, tree_span=15)
+	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(node_count=50, tree_count=5, tree_span=30)
 
 	if draw_instance:
 		draw_DCP_instance(graph, existence_for_node_time, connectivity_demands)
