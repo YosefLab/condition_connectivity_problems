@@ -11,7 +11,11 @@ def test_solve_random_instance(detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a randomly generated instance.
 	"""
-	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(node_count=50, tree_count=5, tree_span=30)
+	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(
+		node_count=100,
+		tree_count=10,
+		tree_span=20
+	)
 
 	if detailed_output:
 		draw_DCP_instance(graph, existence_for_node_time, connectivity_demands)
@@ -114,15 +118,15 @@ def test_solve_anti_greedy_instance(detailed_output=False):
 
 if __name__ == "__main__":
 	tests = [
-		(test_solve_path_instance, {'feasible': True}),
-		(test_solve_path_instance, {'feasible': False}),
+		# (test_solve_path_instance, {'feasible': True}),
+		# (test_solve_path_instance, {'feasible': False}),
 
-		(test_solve_tree_instance, {'multiple_times': True}),
-		(test_solve_tree_instance, {'multiple_times': False}),
+		# (test_solve_tree_instance, {'multiple_times': True}),
+		# (test_solve_tree_instance, {'multiple_times': False}),
 
 		(test_solve_random_instance, {}),
 
-		(test_solve_anti_greedy_instance, {}),
+		# (test_solve_anti_greedy_instance, {}),
 	]
 
 	for test, kwargs in tests:
