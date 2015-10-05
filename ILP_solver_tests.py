@@ -10,7 +10,7 @@ import matplotlib.pyplot as pyplot
 def test_solve_random_DCP_instance():
 	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(node_count=10, tree_count=2, tree_span=7)
 
-	print("Graph has total weight " + str(graph.size(weight='weight')))
+	print('Testing random DCP instance with total weight ' + str(graph.size(weight='weight')))
 
 	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands)
 

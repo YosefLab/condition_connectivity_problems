@@ -101,6 +101,11 @@ def solve_DCP_instance(graph, existence_for_node_time, connectivity_demands):
 		subgraph.remove_nodes_from([source_buffer for source_buffer in subgraph.successors(source)])
 		subgraph.remove_nodes_from([target_buffer for target_buffer in subgraph.predecessors(target)])
 		subgraph.remove_nodes_from([source, target])
+
+		print( '-----------------------------------------------------------------------' )
+		print('Recovered DCP solution from sDCP solution. Edges in minimal subgraph:')
+		print_edges_in_graph(subgraph)
+
 		return subgraph
 
 	# Reduce to sDCP
@@ -191,6 +196,7 @@ def solve_sDCP_instance(graph, existence_for_node_time, connectivity_demands):
 				subgraph.add_edge(u, v, weight=graph[u][v]['weight'])
 
 		# Print solution
+		print( '-----------------------------------------------------------------------' )
 		print('Solved sDCP instance. Edges in minimal subgraph:')
 		print_edges_in_graph(subgraph)
 
