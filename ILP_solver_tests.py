@@ -11,19 +11,26 @@ def test_solve_random_instance(detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a randomly generated instance.
 	"""
+	node_count = 100
+	tree_count = 10
+	tree_span = 20
+
 	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(
-		node_count=100,
-		tree_count=10,
-		tree_span=20
+		node_count=node_count,
+		tree_count=tree_count,
+		tree_span=tree_span
 	)
 
 	if detailed_output:
 		draw_DCP_instance(graph, existence_for_node_time, connectivity_demands)
 
-	print('Testing random DCP instance.')
-	print('Total weight: ' + str(graph.size(weight='weight')))
+	print 'Testing random DCP instance.'
+	print 'node_count: ' + str(node_count)
+	print 'tree_count: ' + str(tree_count)
+	print 'tree_span: ' + str(tree_span)
+	print 'Total weight: ' + str(graph.size(weight='weight'))
 	if detailed_output:
-		print('Connectivity demands: ' + str([(demand[0], demand[1]) for demand in connectivity_demands]))
+		print 'Connectivity demands: ' + str([(demand[0], demand[1]) for demand in connectivity_demands])
 
 	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output)
 
@@ -32,7 +39,7 @@ def test_solve_path_instance(feasible=True, detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a simple path at two time points.
 	"""
-	print('Testing path instance, should be ' + ('feasible' if feasible else 'infeasible'))
+	print 'Testing path instance, should be ' + ('feasible' if feasible else 'infeasible')
 
 	graph = networkx.DiGraph()
 
@@ -60,7 +67,7 @@ def test_solve_tree_instance(multiple_times=True, detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a directed tree at two time points.
 	"""
-	print('Testing tree instance with ' + ('multiple times' if multiple_times else 'single time'))
+	print 'Testing tree instance with ' + ('multiple times' if multiple_times else 'single time')
 
 	graph = networkx.DiGraph()
 
@@ -89,7 +96,7 @@ def test_solve_anti_greedy_instance(detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a small instance that penalizes greedy behavior.
 	"""
-	print('Testing anti-greedy instance')
+	print 'Testing anti-greedy instance'
 
 	graph = networkx.DiGraph()
 
@@ -130,8 +137,8 @@ if __name__ == "__main__":
 	]
 
 	for test, kwargs in tests:
-		print( '-----------------------------------------------------------------------' )
+		print '-----------------------------------------------------------------------'
 		test(detailed_output=False, **kwargs)
-		print( '-----------------------------------------------------------------------\n\n' )
+		print '-----------------------------------------------------------------------\n\n'
 
 
