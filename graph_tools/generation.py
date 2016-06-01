@@ -15,6 +15,8 @@ def create_sample_DCP_instance(node_count=100, tree_count=10, tree_span=float('i
 	The graph is created by sampling trees (each on at most tree_span nodes) from a pool of nodes,
 	then taking their union.
 	"""
+	assert tree_span > 1, 'Sampled trees must contain at least two nodes each.'
+
 	nodes = create_node_pool(node_count)
 
 	# Map each (node, time) to its existence, initially 0
@@ -102,7 +104,8 @@ def create_random_spanning_tree(nodes):
 	"""
 	components = networkx.utils.UnionFind()
 	tree = networkx.Graph()
-	possible_edges = [(u,v) for u in nodes for v in nodes]
+	tree.add_nodes_from(nodes)
+	possible_edges = [(u,v) for u in nodes for v in nodes if u != v]
 
 	# Shuffle edges to make function stochastic
 	random.shuffle(possible_edges)
