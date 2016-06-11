@@ -34,7 +34,25 @@ _Note:_ This function works by modeling the instance as an integer linear progra
 
 ### Generating Artificial Instances
 
-_Coming soon._
+We implement the following procedure for generating highly-structured random ND-DSN instances given parameters _|V|_, _β_, and _γ_:
 
+1. Instantiate a pool of nodes _V_.
+
+2. Independently sample _β_ directed trees. The _i_th tree is built by uniformly sampling _γ≤|V|_ nodes from _V_, making those nodes active at a new time _t<sub>i</sub>_, generating a random spanning tree on the nodes, and directing the edges so that a designated root node has a path to each leaf. A demand is then created from the root to each leaf at time _t<sub>i</sub>_.
+
+3. Let the graph _G_ be the union of all the directed trees, with all edges having unit weight.
+
+This procedure is implemented in the following function in `/graph_tools/generation.py`:
+
+```python
+# In the following, node_count = |V|, tree_count = β, and tree_span = γ
+create_sample_DCP_instance(node_count=100, tree_count=10, tree_span=20)
+```
+
+To generate an instance and run the algorithm on it all at once, call the following function in `/ILP_solver_tests.py`:
+
+```python
+test_solve_random_instance(node_count=100, tree_count=10, tree_span=20, detailed_output=False)
+```
 
 
