@@ -15,8 +15,9 @@ Formally, the __(Node)-Dynamic Directed Steiner Network (ND-DSN)__ problem is th
 
 The task is to find a subgraph _H ⊆ G_ of minimum total weight such that every demand _(a,b,t) ∈ D_ is satisfied: there exists an _a → b_ path in _H_ at time _t_.
 
-_Our code often refers to this problem by its previous name, the **Dynamic Connectivity Problem (DCP)**._
+_Note: Our code often refers to this problem by its previous name, the **Dynamic Connectivity Problem (DCP)**._
 
+Theoretical aspects of this problem, as well as our algorithm, will be detailed in a forthcoming paper.
 
 
 ---
@@ -29,7 +30,7 @@ The main ND-DSN solver is invoked by calling the following function in `/ILP_sol
 solve_DCP_instance(graph=G, existence_for_node_time=rho, connectivity_demands=D, detailed_output=False)
 ```
 
-_Note:_ This function works by modeling the instance as an integer linear program (ILP), then solving using an optimization library. Even instances of modest size can take prohibitive resources to solve.
+_Note: This function works by modeling the instance as an integer linear program (ILP), then solving using an optimization library. Even instances of modest size can take prohibitive resources to solve._
 
 
 
@@ -50,7 +51,7 @@ This procedure is implemented in the following function in `/graph_tools/generat
 create_sample_DCP_instance(node_count=100, tree_count=10, tree_span=20)
 ```
 
-To generate an instance and run the algorithm on it all at once, call the following function in `/ILP_solver_tests.py`:
+To generate an instance and run the algorithm on it all at once, call the following function in `ILP_solver_tests.py`:
 
 ```python
 test_solve_random_instance(node_count=100, tree_count=10, tree_span=20, detailed_output=False)
