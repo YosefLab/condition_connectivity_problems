@@ -38,7 +38,7 @@ We implement the following procedure for generating highly-structured random ND-
 
 1. Instantiate a pool of nodes _V_.
 
-2. Independently sample _β_ directed trees. The _i_th tree is built by uniformly sampling _γ≤|V|_ nodes from _V_, making those nodes active at a new time _t<sub>i</sub>_, generating a random spanning tree on the nodes, and directing the edges so that a designated root node has a path to each leaf. A demand is then created from the root to each leaf at time _t<sub>i</sub>_.
+2. Independently sample _β_ directed trees. The _i_-th tree is built by uniformly sampling _γ≤|V|_ nodes from _V_, making those nodes active at a new time _t<sub>i</sub>_, generating a random spanning tree on the nodes, and directing the edges so that a designated root node has a path to each leaf. A demand is then created from the root to each leaf at time _t<sub>i</sub>_.
 
 3. Let the graph _G_ be the union of all the directed trees, with all edges having unit weight.
 
