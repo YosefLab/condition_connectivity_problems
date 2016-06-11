@@ -7,19 +7,12 @@ from ILP_solver.ILP_solver import *
 import matplotlib.pyplot as pyplot
 
 
-def test_solve_random_instance(detailed_output=False):
+def test_solve_random_instance(node_count, tree_count, tree_span, detailed_output=False):
 	"""
 	Tests the DCP ILP solver on a randomly generated instance.
 	"""
-	node_count = 100
-	tree_count = 10
-	tree_span = 20
 
-	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(
-		node_count=node_count,
-		tree_count=tree_count,
-		tree_span=tree_span
-	)
+	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(node_count, tree_count, tree_span)
 
 	if detailed_output:
 		draw_DCP_instance(graph, existence_for_node_time, connectivity_demands)
@@ -131,7 +124,7 @@ if __name__ == "__main__":
 		# (test_solve_tree_instance, {'multiple_times': True}),
 		# (test_solve_tree_instance, {'multiple_times': False}),
 
-		(test_solve_random_instance, {}),
+		(test_solve_random_instance, {'node_count': 100, 'tree_count': 10, 'tree_span': 20}),
 
 		# (test_solve_anti_greedy_instance, {}),
 	]
