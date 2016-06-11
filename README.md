@@ -3,7 +3,7 @@
 This project implements an algorithm for solving the directed Steiner network problem in time-varying graphs. It also contains tools for generating interesting instances of the problem to test the feasibility of the algorithm in practice.
 
 
-### Problem Statement
+#### Problem Statement
 
 Formally, the __(Node)-Dynamic Directed Steiner Network (ND-DSN)__ problem is the following: we are given
 
@@ -15,12 +15,12 @@ Formally, the __(Node)-Dynamic Directed Steiner Network (ND-DSN)__ problem is th
 
 The task is to find a subgraph _H ⊆ G_ of minimum total weight such that every demand _(a,b,t) ∈ D_ is satisfied: there exists an _a → b_ path in _H_ at time _t_.
 
-_Our code often refers to this problem by its previous name, the __Dynamic Connectivity Problem (DCP)__._
+_Our code often refers to this problem by its previous name, the **Dynamic Connectivity Problem (DCP)**._
 
 
 
 ---
-## Solving Dynamic Steiner Network Instances
+### Solving Dynamic Steiner Network Instances
 
 The main ND-DSN solver is invoked by calling the following function in `/ILP_solver/ILP_solver.py`:
 
@@ -32,7 +32,7 @@ _Note:_ This function works by modeling the instance as an integer linear progra
 
 
 
-## Generating Artificial Instances
+### Generating Artificial Instances
 
 _Coming soon._
 
