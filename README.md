@@ -25,7 +25,8 @@ _Our code often refers to this problem by its previous name, the **Dynamic Conne
 The main ND-DSN solver is invoked by calling the following function in `/ILP_solver/ILP_solver.py`:
 
 ```python
-solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output=False)
+# In the following, G is a NetworkX DiGraph, rho is a dictionary, and D is a list of triples. See the docstring for details.
+solve_DCP_instance(graph=G, existence_for_node_time=rho, connectivity_demands=D, detailed_output=False)
 ```
 
 _Note:_ This function works by modeling the instance as an integer linear program (ILP), then solving using an optimization library. Even instances of modest size can take prohibitive resources to solve.
@@ -38,7 +39,7 @@ We implement the following procedure for generating highly-structured random ND-
 
 1. Instantiate a pool of nodes _V_.
 
-2. Independently sample _β_ directed trees. The _i_-th tree is built by uniformly sampling _γ≤|V|_ nodes from _V_, making those nodes active at a new time _t<sub>i</sub>_, generating a random spanning tree on the nodes, and directing the edges so that a designated root node has a path to each leaf. A demand is then created from the root to each leaf at time _t<sub>i</sub>_.
+2. Independently sample _β_ directed trees. The _i_-th tree is built by uniformly sampling _γ_ nodes from _V_, making those nodes active at a new time _t<sub>i</sub>_, generating a random spanning tree on the nodes, and directing the edges so that a designated root node has a path to each leaf. A demand is then created from the root to each leaf at time _t<sub>i</sub>_.
 
 3. Let the graph _G_ be the union of all the directed trees, with all edges having unit weight.
 
