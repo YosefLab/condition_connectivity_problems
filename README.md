@@ -40,9 +40,11 @@ We implement the following procedure for generating highly-structured random ND-
 
 1. Instantiate a pool of nodes _V_.
 
-2. Independently sample _β_ directed trees. The _i_-th tree is built by uniformly sampling _γ_ nodes from _V_, making those nodes active at a new time _t<sub>i</sub>_, generating a random spanning tree on the nodes, and directing the edges so that a designated root node has a path to each leaf. A demand is then created from the root to each leaf at time _t<sub>i</sub>_.
+2. Independently sample _β_ arborescences (directed trees). The _i_-th one is created by uniformly sampling _γ_ nodes from _V_, activating those nodes at a new time _t<sub>i</sub>_, and generating a random arborescence spanning the nodes. Demands are added from the root to each leaf at time _t<sub>i</sub>_.
 
-3. Let the graph _G_ be the union of all the directed trees, with all edges having unit weight.
+3. Let the graph _G_ be the union of all the arborescences, with all edges having unit weight.
+
+![](figures/generating_random_instances.png "Generating structured random instances")
 
 This procedure is implemented in the following function in `/graph_tools/generation.py`:
 
