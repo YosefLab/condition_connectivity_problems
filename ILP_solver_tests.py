@@ -1,36 +1,12 @@
 """
 This file tests ILP solver functionality.
 """
-from graph_tools.generation import *
-from graph_tools.visualization import *
+
 from ILP_solver.ILP_solver import *
-import matplotlib.pyplot as pyplot
-
-
-def test_solve_random_instance(node_count, tree_count, tree_span, detailed_output=False):
-	"""
-	Tests the DCP ILP solver on a randomly generated instance.
-	"""
-
-	graph, existence_for_node_time, connectivity_demands = create_sample_DCP_instance(node_count, tree_count, tree_span)
-
-	if detailed_output:
-		draw_DCP_instance(graph, existence_for_node_time, connectivity_demands)
-
-	print 'Testing random DCP instance.'
-	print 'node_count: ' + str(node_count)
-	print 'tree_count: ' + str(tree_count)
-	print 'tree_span: ' + str(tree_span)
-	print 'Total weight: ' + str(graph.size(weight='weight'))
-	if detailed_output:
-		print 'Connectivity demands: ' + str([(demand[0], demand[1]) for demand in connectivity_demands])
-
-	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output)
-
 
 def test_solve_path_instance(feasible=True, detailed_output=False):
 	"""
-	Tests the DCP ILP solver on a simple path at two time points.
+	Tests the DCSN ILP solver on a simple path at two conditions .
 	"""
 	print 'Testing path instance, should be ' + ('feasible' if feasible else 'infeasible')
 
@@ -40,7 +16,7 @@ def test_solve_path_instance(feasible=True, detailed_output=False):
 	for u,v in graph.edges_iter():
 		graph[u][v]['weight'] = 1
 	
-	existence_for_node_time = {
+	existence_for_node_condition = {
 		(1,1): 1,
 		(2,1): 1,
 		(3,1): 1,
@@ -53,14 +29,14 @@ def test_solve_path_instance(feasible=True, detailed_output=False):
 
 	connectivity_demands = [(1,4,1), (1,4,2)]
 
-	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output)
+	solve_DCSN_instance(graph, existence_for_node_condition, connectivity_demands, detailed_output)
 
 
-def test_solve_tree_instance(multiple_times=True, detailed_output=False):
+def test_solve_tree_instance(multiple_conditions=True, detailed_output=False):
 	"""
-	Tests the DCP ILP solver on a directed tree at two time points.
+	Tests the DCSN ILP solver on a directed tree at two conditions.
 	"""
-	print 'Testing tree instance with ' + ('multiple times' if multiple_times else 'single time')
+	print 'Testing tree instance with ' + ('multiple conditions' if multiple_conditions else 'single condition')
 
 	graph = networkx.DiGraph()
 
@@ -69,7 +45,7 @@ def test_solve_tree_instance(multiple_times=True, detailed_output=False):
 	for u,v in graph.edges_iter():
 		graph[u][v]['weight'] = 1
 
-	existence_for_node_time = {
+	existence_for_node_condition = {
 		(1,1): 1,
 		(2,1): 1,
 		(3,1): 1,
@@ -80,14 +56,14 @@ def test_solve_tree_instance(multiple_times=True, detailed_output=False):
 		(4,2): 1
 	}
 
-	connectivity_demands = [(1,3,1), (1,4,2 if multiple_times else 1)]
+	connectivity_demands = [(1,3,1), (1,4,2 if multiple_conditions else 1)]
 
-	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output)
+	solve_DCSN_instance(graph, existence_for_node_condition, connectivity_demands, detailed_output)
 
 
 def test_solve_anti_greedy_instance(detailed_output=False):
 	"""
-	Tests the DCP ILP solver on a small instance that penalizes greedy behavior.
+	Tests the DCSN ILP solver on a small instance that penalizes greedy behavior.
 	"""
 	print 'Testing anti-greedy instance'
 
@@ -98,7 +74,7 @@ def test_solve_anti_greedy_instance(detailed_output=False):
 	graph.add_edge(3, 4, weight=5)
 	graph.add_edge(4, 2, weight=1)
 
-	existence_for_node_time = {
+	existence_for_node_condition = {
 		(1,1): 1,
 		(2,1): 1,
 		(3,1): 1,
@@ -111,22 +87,49 @@ def test_solve_anti_greedy_instance(detailed_output=False):
 
 	connectivity_demands = [(1,2,1), (3,4,2)]
 
-	solve_DCP_instance(graph, existence_for_node_time, connectivity_demands, detailed_output)
+	solve_DCSN_instance(graph, existence_for_node_condition, connectivity_demands, detailed_output)
 
 
+def test_solve_single_source_instance(detailed_output=False):
+	"""
+	Tests the DCSN ILP solver on a simple path at two conditions .
+	"""
+	print 'Testing single source instance'
+
+	graph = networkx.DiGraph()
+
+	graph.add_path([1, 2, 3])
+	graph.add_path([1, 2, 4])
+	for u, v in graph.edges_iter():
+		graph[u][v]['weight'] = 1
+
+	existence_for_node_condition = {
+		(1, 1): 1,
+		(2, 1): 1,
+		(3, 1): 1,
+		(4, 1): 1,
+		(1, 2): 1,
+		(2, 2): 1,
+		(3, 2): 1,
+		(4, 2): 1
+	}
+
+	connectivity_demands = [(1, 4, 1), (1, 3, 1), (1,4,2), (1,3,2)]
+
+	solve_single_source_DCSN_instance(graph, existence_for_node_condition, connectivity_demands, detailed_output)
 
 
 if __name__ == "__main__":
 	tests = [
-		# (test_solve_path_instance, {'feasible': True}),
-		# (test_solve_path_instance, {'feasible': False}),
+		 #(test_solve_path_instance, {'feasible': True}),
+		 #(test_solve_path_instance, {'feasible': False}),
 
-		# (test_solve_tree_instance, {'multiple_times': True}),
-		# (test_solve_tree_instance, {'multiple_times': False}),
+		 #(test_solve_tree_instance, {'multiple_conditions': True}),
+		 #(test_solve_tree_instance, {'multiple_conditions': False}),
 
-		(test_solve_random_instance, {'node_count': 100, 'tree_count': 10, 'tree_span': 20}),
+		#(test_solve_random_instance, {'node_count': 100, 'tree_count': 10, 'tree_span': 20}),
 
-		# (test_solve_anti_greedy_instance, {}),
+		 #(test_solve_anti_greedy_instance, {}),
 	]
 
 	for test, kwargs in tests:

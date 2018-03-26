@@ -1,62 +1,59 @@
-# Dynamic Steiner Network / Dynamic Connectivity
+# Directed Condition Steiner Network
 
-This project implements an algorithm for solving the directed Steiner network problem in time-varying graphs. It also contains tools for generating interesting instances of the problem to test the feasibility of the algorithm in practice.
+This project implements an algorithm for solving the Directed Steiner Network problem in condition-varying graphs. It also contains tools for generating interesting instances of the problem to test the feasibility of the algorithm in practice. We note that although this solver is focused on the node-varying case, it is shown in our theoretical paper that the node varying and edge varying cases are equivalent.
 
 
 #### Problem Statement
 
-Formally, the __(Node)-Dynamic Directed Steiner Network (ND-DSN)__ problem is the following: we are given
+Formally, the __(Node)-Directed Condition Steiner Network (DCSN)__ problem is the following: we are given
 
-1. A weighted directed graph _G = (V,E,w)_.
+1. A series of weighted directed graphs _G<sub>1</sub> = (V<sub>1</sub>, E, w)_ , ...,  _G<sub>n</sub> = (V<sub>n</sub>, E, w)_ .
 
-2. An _existence function_ _ρ : V × [T] → {0,1}_ indicating whether each vertex exists at each time.
+3. A set of _k_ condition-sensitive _connectivity demands_ _D ⊆ V × V × [C]_.
 
-3. A set of _k_ time-sensitive _connectivity demands_ _D ⊆ V × V × [T]_.
-
-The task is to find a subgraph _H ⊆ G_ of minimum total weight such that every demand _(a,b,t) ∈ D_ is satisfied: there exists an _a → b_ path in _H_ at time _t_.
-
-_Note: Our code often refers to this problem by its previous name, the **Dynamic Connectivity Problem (DCP)**._
+The task is to find a subgraph _H ⊆ G_ of minimum total weight such that every demand _(a,b,c) ∈ D_ is satisfied: there exists an _a → b_ path in _H_ at time _c_.
 
 Theoretical aspects of this problem, as well as our algorithm, will be detailed in a forthcoming paper.
 
 
 ---
-### Solving Dynamic Steiner Network Instances
+### Solving Directed Condition Steiner Network Instances
 
-The main ND-DSN solver is invoked by calling the following function in `/ILP_solver/ILP_solver.py`:
+The main DCSN solver is invoked by calling the following function in `/ILP_solver/ILP_solver.py`:
 
 ```python
-# In the following, G is a NetworkX DiGraph, rho is a dictionary, and D is a list of triples. See the docstring for details.
-solve_DCP_instance(graph=G, existence_for_node_time=rho, connectivity_demands=D, detailed_output=False)
+# In the following, G is a NetworkX DiGraph, rho is a dictionary corresponding to whether v is in V_c, and D is a list of triples. See the docstring for details.
+solve_DCSN_instance(graph=G, existence_for_node_time=rho, connectivity_demands=D, detailed_output=False)
 ```
 
-_Note: This function works by modeling the instance as an integer linear program (ILP), then solving using an optimization library. Even instances of modest size can take prohibitive resources to solve._
+The single source DCSN solver is invoked similarly, by calling the following function in `/ILP_solver/ILP_solver.py`:
+
+```python
+# In the following, G is a NetworkX DiGraph, rho is a dictionary corresponding to whether v is in V_c, and D is a list of triples where the source is unique per condition. See the docstring for details.
+solve_single_source_DCSN_instance(graph=G, existence_for_node_time=rho, connectivity_demands=D, detailed_output=False)
+```
+
+
+_Note_: This function works by modeling the instance as an integer linear program (ILP), then solving using an optimization library.
 
 
 
 ### Generating Artificial Instances
 
-We implement the following procedure for generating highly-structured random ND-DSN instances given parameters _|V|_, _β_, and _γ_:
+We implement the following procedure for generating highly-structured random DCSN instances given parameters __G__, _β_, _γ_, and __p__:
 
-1. Instantiate a pool of nodes _V_.
+1. Give an underlying graph _G_, such as the human protein-protein interaction network, and fix a source node _s_.
 
-2. Independently sample _β_ arborescences (directed trees). The _i_-th one is created by uniformly sampling _γ_ nodes from _V_, activating those nodes at a new time _t<sub>i</sub>_, and generating a random arborescence spanning the nodes. Demands are added from the root to each leaf at time _t<sub>i</sub>_.
+2. Independently sample _β_ nodes reachable from _s_. Activate all nodes on the shortest path from _s_ to the node. Demands are added from _s_ to each demand.
 
-3. Let the graph _G_ be the union of all the arborescences, with all edges having unit weight.
+3. Repeat this process for _γ_ conditions.
 
-![](figures/generating_random_instances.png "Generating structured random instances")
+4. For all other nodes, set v to be included in V<sub>c</sub> with probability _p_.
 
 This procedure is implemented in the following function in `/graph_tools/generation.py`:
 
 ```python
-# In the following, node_count = |V|, tree_count = β, and tree_span = γ
-create_sample_DCP_instance(node_count=100, tree_count=10, tree_span=20)
+create_sample_DCSN_instance(graph, condition_count=100, demands_count_per_source = 100, node_active_prob=.75)
 ```
 
-To generate an instance and run the algorithm on it all at once, call the following function in `ILP_solver_tests.py`:
-
-```python
-test_solve_random_instance(node_count=100, tree_count=10, tree_span=20, detailed_output=False)
-```
-
-
+To view example instances and run the algorithm, please view `ILP_solver_tests.py`:

@@ -3,59 +3,69 @@ This file implements algorithms for generating sample graphs.
 """
 import networkx
 import random
+import pickle
 
 
-def create_sample_DCP_instance(node_count=100, tree_count=10, tree_span=float('infinity')):
+def create_sample_DCSN_instance(graph, condition_count=100, demands_count_per_source = 100, node_active_prob=.75):
 	"""
-	Generates a sample DCP problem instance:
+	Generates a sample DCSN problem instance:
 		- A directed graph with attribute 'weight' on all edges
-		- A dictionary from (node, time) to existence {True, False}
-		- A list of connectivity demands (source, target, time)
+		- Number of conditions to generate
+		- Number of demands per node
+		- Probability a node is active in any condition
+
+	Returns:
+		- A directed graph with attribute 'weight' on all edges
+		- A dictionary from (node, condition) to existence {True, False}
+		- A list of connectivity demands (source, target, condition)
 
 	The graph is created by sampling trees (each on at most tree_span nodes) from a pool of nodes,
 	then taking their union.
 	"""
-	assert tree_span > 1, 'Sampled trees must contain at least two nodes each.'
 
-	nodes = create_node_pool(node_count)
 
-	# Map each (node, time) to its existence, initially 0
-	existence_for_node_time = {(node,time): 0 for node in nodes for time in range(tree_count)}
+	# Map each (node, condition) to its existence, initially 0
+	existence_for_node_condition = {(node, condition): 0 if random.uniform(0,1) < node_active_prob else 1 for node in graph.nodes() for condition in range(condition_count)}
 
-	# List of connectivity demands in the form (source, target, time)
+	# List of connectivity demands in the form (source, target, condition)
 	connectivity_demands = []
 
-	# Sample a tree at each time point
-	trees = []
-	for time in range(tree_count):
+	# Sample a tree at each condition point
+	nodes = graph.nodes()
 
-		# Choose a random subset of the nodes from which to build the tree
-		tree_nodes = random.sample(nodes, min(len(nodes), tree_span))
+	edges = {}
+	source = random.choice(nodes)
+	reachable_nodes_from_source = networkx.descendants(graph, source)
+	while len(reachable_nodes_from_source) < demands_count_per_source:
+		source = random.choice(nodes)
+		reachable_nodes_from_source = networkx.descendants(graph, source)
 
-		# Sample a tree
-		tree, source, terminals = create_sample_tree(tree_nodes)
+	for condition in range(condition_count):
+		print "Processing generated graph for c =", condition
 
-		# Record tree
-		trees += [tree]
+		existence_for_node_condition[(source, condition)] = 1
 
-		# Record existence of tree nodes at the current time
-		for node in tree.nodes_iter():
-			existence_for_node_time[node,time] = 1
+		samples = random.sample(reachable_nodes_from_source, demands_count_per_source)
 
-		# Record connectivity demands for this tree/time
-		for target in terminals:
-			connectivity_demands += [(source, target, time)]
+		for sample in samples:
+			shortest_path_source_sample = networkx.shortest_path(graph, source, sample, weight='weight')
 
 
-	# Union of trees
-	graph = networkx.compose_all(trees)
+			for node in shortest_path_source_sample:
+				existence_for_node_condition[(node, condition)] = 1
+				nodes.append(node)
+			for i in range(0, len(shortest_path_source_sample)-1):
+				edge = [shortest_path_source_sample[i], shortest_path_source_sample[i+1]]
+				edges[(edge[0],edge[1])] = graph[edge[0]][edge[1]]['weight']
+			connectivity_demands += [(source, sample, condition)]
 
-	# Weights on edges
-	# TODO: make weights non-unit
-	for u,v in graph.edges_iter():
-		graph[u][v]['weight'] = 1
 
-	return graph, existence_for_node_time, connectivity_demands
+	total = 0
+	for x,y in edges.items():
+		total += y
+
+	print "Total Cost of SP solution:", total
+	return graph, existence_for_node_condition, connectivity_demands
 
 
 
@@ -144,6 +154,7 @@ def directed_tree_from_undirected_tree(undirected_tree, root):
 	explore_node(root)
 
 	return directed_tree
+
 
 
 

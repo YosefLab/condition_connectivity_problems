@@ -6,10 +6,10 @@ import matplotlib.pyplot as pyplot
 import time, datetime
 
 
-def draw_DCP_instance(graph, existence_for_node_time, connectivity_demands):
+def draw_DCSN_instance(graph, existence_for_node_conditions, connectivity_demands):
 	# Assign non-terminals red, terminals green
 	color_for_node = {node : 'r' for node in graph.nodes()}
-	for source, target, time in connectivity_demands:
+	for source, target, condition in connectivity_demands:
 		color_for_node[source] = 'g'
 		color_for_node[target] = 'g'
 
